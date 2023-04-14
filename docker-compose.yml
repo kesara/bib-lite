@@ -14,3 +14,9 @@ services:
       - ./bib.db:/app/bib.db
       - ./relaton-data-rfcs/:/app/relaton-data-rfcs/
       - ./relaton-data-ids/:/app/relaton-data-ids/
+      - ./relaton-data-misc/:/app/relaton-data-misc/
+      - ./relaton-data-w3c/:/app/relaton-data-w3c/
+      - ./relaton-data-3gpp/:/app/relaton-data-3gpp/
+      - ./relaton-data-ieee/:/app/relaton-data-ieee/
+      - ./relaton-data-iana/:/app/relaton-data-iana/
+      - ./relaton-data-nist/:/app/relaton-data-nist/
