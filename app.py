@@ -1,4 +1,5 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
+from urllib.parse import quote
 from waitress import serve
 import json
 import sqlite3
@@ -36,6 +37,9 @@ def get(document_id):
 
 @app.route('/search/<query>')
 def search(query):
+    offset = int(request.values.get('offset', 0))
+    limit = int(request.values.get('limit', 100))
+
     conn = sqlite3.connect(SQLITE_DB)
     with conn:
         result = conn.execute(f'''
@@ -46,12 +50,20 @@ WHERE
     title  MATCH ? OR
     abstract MATCH ? OR
     authors MATCH ?
-ORDER BY rank;''',
-                              (query, query, query, query))
+ORDER BY rank
+LIMIT ?
+OFFSET ?;''',
+                              (query, query, query, query, limit, offset))
         docs = result.fetchall()
-        return jsonify({
-            'total_results': len(docs),
-            'documents': docs})
+        if len(docs) == limit:
+            no = offset + limit
+            q = quote(query)
+            url = f'{BASE_URL}/search/{q}?limit={limit}&offset={no}'
+            return jsonify({
+                'documents': docs,
+                'next_results': url})
+        else:
+            return jsonify({'documents': docs})
     return jsonify({'error': 'An error while trying to query database.'})
 
 
